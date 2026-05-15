@@ -1,0 +1,15 @@
+# CSV output files
+*.csv
+
+# R
+.Rhistory
+
+# Python cache
+__pycache__/
+
+# Fix directory
+fix/
+
+# Documents
+*.txt
+*.xlsx
