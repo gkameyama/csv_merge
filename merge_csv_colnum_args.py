@@ -22,6 +22,10 @@ V_RANGES = {
 }
 A_TAIL_RANGE = (10234, 10362)
 
+# Output CSV encoding. Comment/uncomment these lines to switch encodings.
+OUTPUT_ENCODING = "shift_jis"
+# OUTPUT_ENCODING = "utf-8-sig"
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -197,7 +201,7 @@ def merge_csv(files: dict[str, Path], output_file: Path) -> None:
     output_rows = [row for row in output_rows if not has_single_digit_a_column(row)]
 
     output_file.parent.mkdir(parents=True, exist_ok=True)
-    with output_file.open("w", newline="", encoding="utf-8-sig") as out_f:
+    with output_file.open("w", newline="", encoding=OUTPUT_ENCODING) as out_f:
         writer = csv.writer(out_f, lineterminator="\n")
         writer.writerow(output_header)
         writer.writerows(output_rows)
