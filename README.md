@@ -14,7 +14,7 @@ python .\merge_csv_colnum_args.py --a A.csv --b B.csv --c C.csv --d D.csv
 
 - Python 3
 - A/B/C/D それぞれの入力 CSV ファイル
-- 入力 CSV は UTF-8 BOM 付き、または UTF-8 として読み込める形式
+- 入力 CSV は UTF-8 BOM 付き、または Windows/Excel の Shift_JIS 相当である CP932 として読み込める形式
 
 外部ライブラリは使用していません。
 
@@ -47,7 +47,7 @@ python .\merge_csv_colnum_args.py --a .\NHT2602_A0.csv --b .\NHT2602_B0.csv --c 
 
 ## 出力仕様
 
-- 出力 CSV の文字コードは Shift_JIS です。
+- 出力 CSV の文字コードは CP932 です。
 - 1行目にヘッダーを出力します。
 - 先頭列のヘッダー名は `SAMPLENUMBER` に変更します。
 - `SAMPLENUMBER` の昇順でソートして出力します。
@@ -99,13 +99,20 @@ Category A has 100 columns, but column 10362 is required.
 Category A row 2 has 100 columns, but column 10362 is required.
 ```
 
-## 文字コードを変更したい場合
+## 文字コードについて
 
-出力文字コードは `merge_csv_colnum_args.py` 内の `OUTPUT_ENCODING` で指定しています。
+入力 CSV は `merge_csv_colnum_args.py` 内の `INPUT_ENCODINGS` の順に読み込みを試します。
 
 ```python
-OUTPUT_ENCODING = "shift_jis"
-# OUTPUT_ENCODING = "utf-8-sig"
+INPUT_ENCODINGS = ("utf-8-sig", "cp932")
 ```
 
-UTF-8 BOM 付きで出力したい場合は、上の行をコメントアウトし、下の行を有効にしてください。
+出力文字コードは `OUTPUT_ENCODING` で指定しています。
+
+```python
+# OUTPUT_ENCODING = "utf-8-sig"
+OUTPUT_ENCODING = "cp932"
+```
+
+Windows/Excel で一般に Shift_JIS と呼ばれる CSV は、Python では `cp932` を指定します。
+UTF-8 BOM 付きで出力したい場合は、`OUTPUT_ENCODING = "cp932"` をコメントアウトし、`OUTPUT_ENCODING = "utf-8-sig"` を有効にしてください。

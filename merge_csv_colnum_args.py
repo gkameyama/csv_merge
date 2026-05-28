@@ -22,10 +22,12 @@ V_RANGES = {
 }
 A_TAIL_RANGE = (10234, 10362)
 
-# Output CSV encoding. Comment/uncomment these lines to switch encodings.
-OUTPUT_ENCODING = "shift_jis"
-# OUTPUT_ENCODING = "utf-8-sig"
+# Input CSV encodings are tried in this order.
+INPUT_ENCODINGS = ("utf-8-sig", "cp932")
 
+# Output CSV encoding. Use cp932 for Windows/Excel Shift_JIS CSV files.
+# OUTPUT_ENCODING = "utf-8-sig"
+OUTPUT_ENCODING = "cp932"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -44,8 +46,27 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def read_header(path: Path) -> list[str]:
-    with path.open("r", newline="", encoding="utf-8-sig") as f:
+def detect_encoding(path: Path) -> str:
+    raw = path.read_bytes()
+    for encoding in INPUT_ENCODINGS:
+        try:
+            raw.decode(encoding)
+            return encoding
+        except UnicodeDecodeError:
+            continue
+
+    tried = ", ".join(INPUT_ENCODINGS)
+    raise UnicodeDecodeError(
+        INPUT_ENCODINGS[0],
+        raw,
+        0,
+        1,
+        f"Could not decode {path} with any of: {tried}",
+    )
+
+
+def read_header(path: Path, encoding: str) -> list[str]:
+    with path.open("r", newline="", encoding=encoding) as f:
         return next(csv.reader(f))
 
 
@@ -161,7 +182,8 @@ def merge_csv(files: dict[str, Path], output_file: Path) -> None:
     for category, path in files.items():
         validate_file(path, category)
 
-    headers = {category: read_header(path) for category, path in files.items()}
+    encodings = {category: detect_encoding(path) for category, path in files.items()}
+    headers = {category: read_header(path, encodings[category]) for category, path in files.items()}
     validate_columns(headers)
     output_header = build_header(headers)
 
@@ -181,7 +203,7 @@ def merge_csv(files: dict[str, Path], output_file: Path) -> None:
         src_indexes = source_indexes(category)
         dst_indexes = destination_indexes(category, main_offsets, v_offset, a_tail_offset)
 
-        with path.open("r", newline="", encoding="utf-8-sig") as in_f:
+        with path.open("r", newline="", encoding=encodings[category]) as in_f:
             reader = csv.reader(in_f)
             next(reader)
 
