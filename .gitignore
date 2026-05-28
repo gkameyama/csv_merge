@@ -13,3 +13,8 @@ fix/
 # Documents
 *.txt
 *.xlsx
+
+# Data directory
+input/
+output/
+
