@@ -375,7 +375,7 @@ code {
 <ul>
 <li>Python 3</li>
 <li>A/B/C/D それぞれの入力 CSV ファイル</li>
-<li>入力 CSV は UTF-8 BOM 付き、または UTF-8 として読み込める形式</li>
+<li>入力 CSV は UTF-8 BOM 付き、または Windows/Excel の Shift_JIS 相当である CP932 として読み込める形式</li>
 </ul>
 <p>外部ライブラリは使用していません。</p>
 <h2 id="使い方">使い方</h2>
@@ -426,7 +426,7 @@ python .\merge_csv_colnum_args.py <span class="hljs-literal">--a</span> .\NHT260
 <p>同名ファイルがすでに存在する場合は上書きせず、<code>_2</code>、<code>_3</code> のような連番を付けて保存します。</p>
 <h2 id="出力仕様">出力仕様</h2>
 <ul>
-<li>出力 CSV の文字コードは Shift_JIS です。</li>
+<li>出力 CSV の文字コードは CP932 です。</li>
 <li>1行目にヘッダーを出力します。</li>
 <li>先頭列のヘッダー名は <code>SAMPLENUMBER</code> に変更します。</li>
 <li><code>SAMPLENUMBER</code> の昇順でソートして出力します。</li>
@@ -498,12 +498,16 @@ python .\merge_csv_colnum_args.py <span class="hljs-literal">--a</span> .\NHT260
 <p>データ行の列数が足りない場合:</p>
 <pre class="hljs"><code><div>Category A row 2 has 100 columns, but column 10362 is required.
 </div></code></pre>
-<h2 id="文字コードを変更したい場合">文字コードを変更したい場合</h2>
-<p>出力文字コードは <code>merge_csv_colnum_args.py</code> 内の <code>OUTPUT_ENCODING</code> で指定しています。</p>
-<pre class="hljs"><code><div>OUTPUT_ENCODING = <span class="hljs-string">&quot;shift_jis&quot;</span>
-<span class="hljs-comment"># OUTPUT_ENCODING = &quot;utf-8-sig&quot;</span>
+<h2 id="文字コードについて">文字コードについて</h2>
+<p>入力 CSV は <code>merge_csv_colnum_args.py</code> 内の <code>INPUT_ENCODINGS</code> の順に読み込みを試します。</p>
+<pre class="hljs"><code><div>INPUT_ENCODINGS = (<span class="hljs-string">&quot;utf-8-sig&quot;</span>, <span class="hljs-string">&quot;cp932&quot;</span>)
 </div></code></pre>
-<p>UTF-8 BOM 付きで出力したい場合は、上の行をコメントアウトし、下の行を有効にしてください。</p>
+<p>出力文字コードは <code>OUTPUT_ENCODING</code> で指定しています。</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># OUTPUT_ENCODING = &quot;utf-8-sig&quot;</span>
+OUTPUT_ENCODING = <span class="hljs-string">&quot;cp932&quot;</span>
+</div></code></pre>
+<p>Windows/Excel で一般に Shift_JIS と呼ばれる CSV は、Python では <code>cp932</code> を指定します。
+UTF-8 BOM 付きで出力したい場合は、<code>OUTPUT_ENCODING = &quot;cp932&quot;</code> をコメントアウトし、<code>OUTPUT_ENCODING = &quot;utf-8-sig&quot;</code> を有効にしてください。</p>
 
 </body>
 </html>
